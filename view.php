@@ -302,3 +302,4 @@ echo $OUTPUT->header();
 
 <?php
 echo $OUTPUT->footer();
+var_dump($uet->runPythonPredict([6,5,4,3,2,1]));

@@ -6,20 +6,36 @@
  * Time: 19:46
  */
 
-function uetanalytics_add_instance($instance){
+function uetanalytics_add_instance($instance)
+{
     global $DB;
     $instance->timecreated = time();
-    $id = $DB->insert_record('uetanalytics',$instance);
+    $id = $DB->insert_record('uetanalytics', $instance);
 
     return $id;
 }
 
-function uetanalytics_update_instance($instance){
+function uetanalytics_update_instance($instance)
+{
 
 }
 
-function uetanalytics_delete_instance($id){
+function uetanalytics_delete_instance($id)
+{
     global $DB;
 
     return true;
+}
+
+function uetanalytics_install()
+{
+    exec('sudo apt install pip3');
+    exec('pip3 install uetla');
+
+
+}
+
+function uetanalytics_uninstall()
+{
+
 }

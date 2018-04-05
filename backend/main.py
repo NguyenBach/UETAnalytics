@@ -1,9 +1,11 @@
-#!/usr/bin/python3.6
-from UETAnalytics import UETAnalytics
+#!/usr/bin/p
+from uetla.UETAnalytics import UETAnalytics
 import sys
+import os
+from os.path import expanduser
 arg = sys.argv
-
-uet = UETAnalytics()
+filepath = os.path.dirname(os.path.realpath(__file__))
+uet = UETAnalytics(filepath)
 week = int(arg[1])
 data = {
     'view': float(arg[2]),

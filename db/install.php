@@ -8,6 +8,20 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_uetanalytics_install() {
-    global $CFG;
-
+    global $CFG,$DB;
+    $columns = $DB->get_columns('uet_dataset');
+    $columns = array_keys($columns);
+    $file = fopen($CFG->dirroot.'/mod/uetanalytics/backend/trainingdata.csv', 'r');
+    while (($data = fgetcsv($file)) !== FALSE) {
+        $row = new stdClass();
+        foreach ($columns as $index => $column){
+            $row->$column = doubleval($data[$index]);
+        }
+        $DB->insert_record('uet_dataset', $row);
+    }
+    fclose($file);
+    shell_exec('pip3 install uetla');
+    $command = 'cd '.$CFG->dirroot.'/mod/uetanalytics/backend ; python3 model.py  2>&1';
+    $a = shell_exec($command);
+    var_dump($a);
 }

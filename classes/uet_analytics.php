@@ -344,7 +344,6 @@ class uet_analytics
         } else {
             $week = 15;
         }
-        $week = 10;
         $row['week'] = $week;
         $stat = $this->getViewPostInSection($week, $studentid);
         $modules = $this->getNumberModulesInSection($week);
@@ -399,7 +398,7 @@ class uet_analytics
 
     public function runPythonPredict($data){
         $d = implode(' ',$data);
-        $cmd ="cd backend/MoodleCommanline ; python3 -W ignore main.py ".$d." 2>&1";
+        $cmd ="cd backend ; python3 -W ignore main.py ".$d." 2>&1";
         $output = shell_exec($cmd);
         $output = json_decode($output);
         return $output;

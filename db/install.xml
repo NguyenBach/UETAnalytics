@@ -27,7 +27,7 @@
                 <FIELD SEQUENCE="false" TYPE="text" NAME="model_name" NOTNULL="true"/>
                 <FIELD NAME="type" SEQUENCE="false" TYPE="text" NOTNULL="true"/>
                 <FIELD NAME="version" LENGTH="10" SEQUENCE="false" TYPE="int" NOTNULL="true"/>
-                <FIELD NAME="status" SEQUENCE="false" TYPE="binary" NOTNULL="true"/>
+                <FIELD NAME="status" SEQUENCE="false" TYPE="int" LENGTH="2" NOTNULL="true"/>
                 <FIELD NAME="created_at" SEQUENCE="false" TYPE="datetime" NOTNULL="false"/>
                 <FIELD NAME="modified_at" SEQUENCE="false" TYPE="datetime" NOTNULL="false"/>
             </FIELDS>
