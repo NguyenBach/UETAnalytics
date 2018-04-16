@@ -227,6 +227,16 @@ class uet_render
         return $script;
     }
 
+    public function studentArray(){
+        $student = $this->course->getStudents();
+        $str = '[';
+        foreach ($student as $s){
+            $str.= $s->userid .',';
+        }
+        $str .= ']';
+        return $str;
+    }
+
 
     public function setPage($url)
     {
@@ -240,13 +250,11 @@ class uet_render
         $PAGE->set_cm($this->cm);
         $PAGE->requires->css('/mod/uetanalytics/assets/css/bootstrap.min.css');
         $PAGE->requires->css('/mod/uetanalytics/assets/css/animate.min.css');
-        $PAGE->requires->css('/mod/uetanalytics/assets/css/demo.css');
         $PAGE->requires->css('/mod/uetanalytics/assets/css/paper-dashboard.css');
         $PAGE->requires->css('/mod/uetanalytics/assets/css/themify-icons.css');
         $PAGE->requires->jquery();
         $PAGE->requires->js(new moodle_url("$CFG->wwwroot/mod/uetanalytics/assets/js/chartist.min.js"), true);
         $PAGE->requires->js(new moodle_url("$CFG->wwwroot/mod/uetanalytics/assets/js/bootstrap.min.js"));
-//        $PAGE->requires->js(new moodle_url("$CFG->wwwroot/mod/uetanalytics/assets/js/demo.js"));
         $PAGE->requires->js(new moodle_url("$CFG->wwwroot/mod/uetanalytics/assets/js/paper-dashboard.js"));
 
     }

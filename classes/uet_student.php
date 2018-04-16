@@ -139,6 +139,25 @@ class uet_student extends uet_user
     {
         $this->predict = $predict;
     }
+
+    public function getNotification(){
+        global $DB;
+        $now = time();
+        $params['courseid'] = $this->course->getCourseId();
+        $params['userid'] = $this->getUserId();
+        $params['timeend'] = $now;
+        try {
+            $notifications = $DB->get_record_sql('SELECT * FROM {uet_notification} WHERE courseid =:courseid AND userid=:userid AND timeend >= :timeend AND status = 1', $params);
+        } catch (\dml_exception $e) {
+            print($e);
+        }
+        if($notifications){
+            return $notifications->notification;
+        }else{
+            return '';
+        }
+
+    }
     
     public function setupStudent(){
         $uet = new uet_analytics($this->course->getCourseId());
@@ -152,6 +171,20 @@ class uet_student extends uet_user
         $this->setSubmission($submission);
         $this->setPredict($uet->predict($this->getUserId()));
         $this->setGrade($uet->getGrade($this->getUserId()));
+    }
+
+    public function toArray(){
+        return [
+            'userid'=> $this->getUserId(),
+            'fullname'=> $this->getName(),
+            'view' => $this->getView(),
+            'post' => $this->getPost(),
+            'forumview' => $this->getForumview(),
+            'forumpost' => $this->getForumpost(),
+            'assignment' =>$this->getSubmission(),
+            'predict' => $this->getPredict(),
+            'grade' => $this->getGrade()
+        ];
     }
 
 }

@@ -73,6 +73,7 @@ $(document).ready(function () {
 
     $('#send').click(function () {
         var type = $(this).attr('data-type');
+        var data;
         if (type == 'message') {
             var data = {
                 'action': 'sendmessage',
@@ -82,23 +83,62 @@ $(document).ready(function () {
                 'msgmessage': $("textarea[name='msgmessage']").val(),
                 'courseid': $("input[name='courseid']").val()
             };
-            $.ajax({
-                url: 'http://moodle.local/mod/uetanalytics/ajax.php/',
-                method: 'post',
-                async: true,
-                data: data,
-                dataType: 'json',
-                success: function (data) {
-                    if(data.sent){
-                        alert('Message Sent');
-                        $('#over, .message-popup').fadeOut(300, function () {
-                            $('#over').remove();
-                        });
-                    }
-                }
-            });
+
         }
+        if(type == 'notify'){
+            var data = {
+                'action': 'notify',
+                'from': $("input[name='from']").val(),
+                'to': $("input[name='to']").val(),
+                'notification': $("textarea[name='msgmessage']").val(),
+                'courseid': $("input[name='courseid']").val()
+            };
+        }
+        $.ajax({
+            url: 'http://moodle.local/mod/uetanalytics/ajax.php/',
+            method: 'post',
+            async: true,
+            data: data,
+            dataType: 'json',
+            success: function (data) {
+                if(data.sent){
+                    alert('Sent');
+                    $('#over, .message-popup').fadeOut(300, function () {
+                        $('#over').remove();
+                    });
+                }
+            }
+        });
     });
+    // $.each(student,function (key, value) {
+    //     $.ajax({
+    //         url: 'http://moodle.local/mod/uetanalytics/ajax.php/',
+    //         method: 'post',
+    //         async: true,
+    //         data: {'action':'student','courseid':coursid,'studentid':value},
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             data.predict = {w7:"A",w15:"B"};
+    //             var assigment = 'S: '+data.assignment.submitted+'/' + data.assignment.total+
+    //                             'L: '+data.assignment.late+'/' + data.assignment.submitted+
+    //                             'N: '+data.assignment.not+'/' + data.assignment.total;
+    //             var te = '<tr>' +
+    //                 '<td>'+key+'</td>' +
+    //                 '<td>'+data.fullname+'</td>' +
+    //                 '<td>'+data.view+'</td>' +
+    //                 '<td>'+data.post+'</td>' +
+    //                 '<td> View: '+data.forumview+' Post: '+data.forumpost+'</td>' +
+    //                 '<td>'+data.forumpost+'</td>' +
+    //                 '<td>'+assigment+'</td>' +
+    //                 '<td> Mid: '+data.predict.w7+'Fin: '+data.predict.w15+'</td>' +
+    //                 '<td> Mid: '+data.grade.mid+'Fin: '+data.grade.final+'</td>' +
+    //                 '</tr>';
+    //             $('#table-statis').append(te);
+    //
+    //         }
+    //     });
+    // });
+
 
 });
 

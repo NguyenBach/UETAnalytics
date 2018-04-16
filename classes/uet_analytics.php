@@ -48,6 +48,56 @@ class uet_analytics
         return $grade;
     }
 
+    public function getViewPost($section, $studentid)
+    {
+        global $DB;
+        $time = $this->getTimeOfSection($section);
+        $sql = 'AND userid = :userid';
+        $params = [
+            'courseid' => $this->course->getCourseId(),
+            'stype' => 'activity',
+            'userid' => $studentid,
+            'edulevel' => 2,
+            'action' => 'viewed',
+            'timecreated' => $time,
+        ];
+        $view = $DB->get_record_sql("SELECT count(*) as view FROM {logstore_standard_log} WHERE courseid = :courseid 
+                                                                                            AND action= :action
+                                                                                            AND edulevel = :edulevel
+                                                                                            AND timecreated <= :timecreated $sql ", $params);
+        $post_actions = '"submitted" ,"created", "deleted", "updated", "uploaded", "sent"';
+        unset($params['action']);
+        $post = $DB->get_record_sql("SELECT count(*) as post FROM {logstore_standard_log} WHERE courseid = :courseid 
+                                                                                            AND edulevel = :edulevel
+                                                                                            AND timecreated <= :timecreated 
+                                                                                            AND action IN($post_actions) $sql", $params);
+
+        $result['view'] = isset($view->view) ? $view->view : 0;
+        $result['post'] = isset($post->post) ? $post->post : 0;
+        return $result;
+    }
+
+    public function getForumViewPost($section, $studentid)
+    {
+        global $DB;
+        $time = $this->getTimeOfSection($section);
+        $params['courseid'] = $this->course->getCourseId();
+        $params['userid'] = $studentid;
+        $logtable = 'logstore_standard_log';
+        $params['component'] = 'mod_forum';
+        $params['action'] = "viewed";
+        $params['timecreated'] = $time;
+        $sql = 'AND userid = :userid';
+        $a = $DB->get_record_sql("SELECT count(*) as view FROM {" . $logtable . "}
+                                        WHERE  courseid=:courseid AND component = :component $sql AND action=:action AND timecreated <= :timecreated ", $params);
+        $result["view"] = isset($a->view) ? $a->view : 0;
+        $post_actions = '"submitted" ,"created", "deleted", "updated", "uploaded", "sent"';
+        $a = $DB->get_record_sql("SELECT count(*) as post FROM {" . $logtable . "}
+                                        WHERE courseid=:courseid $sql AND component = :component AND action IN ($post_actions) AND timecreated <= :timecreated ", $params);
+        $result['post'] = isset($a->post) ? $a->post : 0;
+        return $result;
+    }
+
     //get view post of student in section
     public function getViewPostInSection($section, $studentid)
     {
@@ -209,8 +259,9 @@ class uet_analytics
     {
         global $DB;
         $params['courseid']= $this->course->getCourseId();
+        $params['course']= $this->course->getCourseId();
         $params['section'] = $section;
-        $cm = $DB->get_record_sql('SELECT COUNT(*) as num FROM {course_modules} WHERE course = :courseid AND section <= :section',$params);
+        $cm = $DB->get_record_sql('SELECT COUNT(*) as num FROM {course_modules} WHERE course = :courseid AND section IN (SELECT id FROM {course_sections} WHERE course <= :course AND section <=:section) ',$params);
         return $cm->num;
     }
 
@@ -260,11 +311,11 @@ class uet_analytics
             $week = 15;
         }
         $row['week'] = $week;
-        $stat = $this->getViewPostInSection($week, $studentid);
+        $stat = $this->getViewPost($week, $studentid);
         $modules = $this->getNumberModulesInSection($week);
         $row['view'] = floatval($stat['view'] / $modules);
         $row['post'] = floatval($stat['post'] / $modules);
-        $forum = $this->getForumViewPostInSection($week, $studentid);
+        $forum = $this->getForumViewPost($week, $studentid);
         $nforum = $this->getNumberForumDiscussionsInSection($week);
         if (!$nforum) {
             $row['forumpost'] = 0;

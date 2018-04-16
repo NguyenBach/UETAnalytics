@@ -88,7 +88,7 @@ class uet_user
         foreach ($roles as $r) {
             $role[] = $r->shortname;
         }
-        if (in_array('teacher', $role)) {
+        if (in_array('teacher', $role) || in_array('coursecreator',$role) || in_array('editingteacher',$role)) {
             return true;
         } else {
             return false;

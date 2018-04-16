@@ -43,12 +43,19 @@ require_login();
 $view = new uet_render($cm, $USER->id);
 $course = new uet_course($course->id);
 $user = new uet_user($USER->id);
+$isTeacher = $user->isTeacher($view->getContext());
+if (!$isTeacher) {
+    $user = new uet_student($user->getUserId(), $course->getCourseId());
+}
 $view->setPage($url);
 $uet = new uet_analytics($course);
 
 echo $OUTPUT->header();
 ?>
-
+    <script type="text/javascript">
+        var student = <?php echo $view->studentArray() ?>;
+        var coursid = <?php echo $course->getCourseId() ?>;
+    </script>
     <div class="main-panel" id="main">
         <?php echo $view->navbar() ?>
 
@@ -60,7 +67,7 @@ echo $OUTPUT->header();
                 </div>
                 <?php
 
-                if (!$user->isTeacher($view->getContext())) {
+                if (!$isTeacher) {
                     $result = $uet->predict($user->getUserId());
                     $grade = $uet->getGrade($user->getUserId());
                     ?>
@@ -78,11 +85,7 @@ echo $OUTPUT->header();
                                                 <div class="content">
                                                     <div class="row">
                                                         <div class="col-xs-4">
-                                                            <h4>Giữa kỳ</h4>
-                                                            <!--                                                        <div class="icon-big icon-warning text-center">-->
-                                                            <!--                                                            <i class="ti-server"></i>-->
-                                                            <!--                                                        </div>-->
-                                                        </div>
+                                                            <h4>Giữa kỳ</h4></div>
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
                                                                 <p>Dự báo</p>
@@ -111,10 +114,8 @@ echo $OUTPUT->header();
                                                     <div class="row">
                                                         <div class="col-xs-4">
                                                             <h4>Cuối kỳ</h4>
-                                                            <!--                                                        <div class="icon-big icon-warning text-center">-->
-                                                            <!--                                                            <i class="ti-server"></i>-->
-                                                            <!--                                                        </div>-->
                                                         </div>
+
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
                                                                 <p>Dự báo</p>
@@ -127,6 +128,28 @@ echo $OUTPUT->header();
                                                                 <?php echo $grade->final ?>
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <hr/>
+                                                        <div class="stats">
+                                                            <i class="ti-reload"></i> Updated now
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="card">
+                                                <div class="content">
+                                                    <div class="row">
+                                                        <div class="col-xs-4">
+                                                            <h4>Thông báo:</h4></div>
+                                                        <div class="col-xs-8">
+                                                            <?php if ($user instanceof uet_student) echo $user->getNotification() ?>
+                                                        </div>
+
                                                     </div>
                                                     <div class="footer">
                                                         <hr/>
@@ -189,7 +212,7 @@ echo $OUTPUT->header();
                                 <div id="chartAssignment" class="ct-chart "></div>
 
                                 <?php
-                                if ($user->isTeacher($view->getContext())) {
+                                if ($isTeacher) {
                                     $view->submitLineChart('chartAssignment');
                                 } else {
                                     ?>
@@ -202,7 +225,7 @@ echo $OUTPUT->header();
                                 <?php } ?>
                                 <div class="footer">
                                     <div class="chart-legend">
-                                        <?php if (!$user->isTeacher($view->getContext())) { ?>
+                                        <?php if (!$isTeacher) { ?>
                                             <i class="fa fa-circle" style="color: #68B3C8"></i> Submitted
                                             <i class="fa fa-circle text-warning"></i> Not Submitted
                                         <?php } ?>
@@ -214,7 +237,7 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                 </div>
-                <?php if ($user->isTeacher($view->getContext())) { ?>
+                <?php if ($isTeacher) { ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card">
@@ -240,7 +263,7 @@ echo $OUTPUT->header();
                                             <th>Action</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="table-statis">
 
                                         <?php
                                         $students = $course->getStudents();
@@ -266,16 +289,23 @@ echo $OUTPUT->header();
                                                 </td>
                                                 <td><?php $predict = $student->getPredict();
                                                     echo 'GK: ' . $predict->w7;
-                                                    echo 'CK: ' . $predict->w15 ?></td>
+                                                    echo ' CK: ' . $predict->w15 ?></td>
                                                 <td><?php $grade = $student->getGrade();
                                                     echo 'GK: ' . $grade->mid;
-                                                    echo 'CK: ' . $grade->final ?></td>
+                                                    echo ' CK: ' . $grade->final ?></td>
                                                 <td>
-                                                    <a href="#" class="message-btn" data-from="<?php echo $user->getUserId() ?>" data-to="<?php echo $student->getUserId(); ?>"><span class="ti-email"></span></a>
-                                                    <a href="#" style="margin-left: 7px;" class="notify-btn" data-from="<?php echo $user->getUserId() ?>" data-to="<?php echo $student->getUserId(); ?>"><span class="ti-alert"></span></a>
+                                                    <a href="#" class="message-btn"
+                                                       data-from="<?php echo $user->getUserId() ?>"
+                                                       data-to="<?php echo $student->getUserId(); ?>"><span
+                                                                class="ti-email"></span></a>
+                                                    <a href="#" style="margin-left: 7px;" class="notify-btn"
+                                                       data-from="<?php echo $user->getUserId() ?>"
+                                                       data-to="<?php echo $student->getUserId(); ?>"><span
+                                                                class="ti-alert"></span></a>
                                                 </td>
                                             </tr>
-                                        <?php if($student->getUserId() == 1439) break;} ?>
+                                            <?php
+                                        } ?>
                                         </tbody>
 
                                     </table>
@@ -320,7 +350,7 @@ echo $OUTPUT->header();
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Subject: </label>
-                                <input type="text" name="msgsubject" class="form-control border-input" value="" >
+                                <input type="text" name="msgsubject" class="form-control border-input" value="">
                             </div>
                         </div>
                     </div>
@@ -334,7 +364,8 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                     <div class="text-center">
-                        <button type="button" id="send" data-type="message" class="btn btn-info btn-fill btn-wd">Send</button>
+                        <button type="button" id="send" data-type="message" class="btn btn-info btn-fill btn-wd">Send
+                        </button>
                         <button type="button" id="cancel" class="btn btn-info btn-fill btn-wd">Cancel</button>
                     </div>
                     <div class="clearfix"></div>
