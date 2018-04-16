@@ -6,79 +6,57 @@
  * Time: 8:36 AM
  */
 
+namespace mod_uetanalytics;
+
+use stdClass;
 
 class uet_analytics
 {
     private $course;
-    private $sections = [];
-    private $students = [];
-    private $assigns = [];
-    private $forums = [];
-    private $cm = [];
-    private $moduleType = [];
+
 
     public function __construct($course)
     {
-        $this->course = $course;
-        $this->sections = $this->getSection(0);
-        $this->students = $this->getStudentsInCourse();
-        $this->assigns = $this->getAllAssigns();
-        $this->forums = $this->getAllForums();
-        $this->cm = $this->getCourseModules();
-        $this->moduleType = $this->getModuleType();
+        if($course instanceof uet_course){
+            $this->course = $course;
+        }else{
+            if(isset($course->id) ){
+                $this->course = new uet_course($course->id);
+            }else{
+                $this->course = new uet_course($course);
+            }
+        }
+
     }
 
-    private function getCourseId()
-    {
-        return $this->course->id;
-    }
 
     public function getTimeOfSection($section)
     {
-        $startdate = $this->course->startdate;
+        $startdate = $this->course->getStartDateInt();
         $time = $startdate + $section * 7 * 24 * 3600;
         return $time;
     }
 
-    public function getGrade($type, $studentid)
+    public function getGrade($studentid)
     {
         global $DB;
-        if ($type == 'mid') {
-            $section = intval(count($this->sections) / 2);
-        } else {
-            $section = count($this->sections);
-        }
-        $assigns = $this->getAssignmentInSection($section);
-        $params['userid'] = $studentid;
-        $params['courseid'] = $this->course->id;
-        $grade = 0;
-        foreach ($assigns as $assign) {
-            $params['assignid'] = $assign->id;
-            $item = $DB->get_record_sql("SELECT id,courseid,itemname FROM {grade_items}
-                                              WHERE iteminstance = :assignid AND courseid=:courseid", $params);
-            $params['itemid'] = $item->id;
-            $item = $DB->get_record_sql("SELECT id,userid,itemid,finalgrade,aggregationweight FROM {grade_grades}
-                                              WHERE userid=:userid AND itemid=:itemid ", $params);
-            if (!$item) {
-                $grade += 0;
-            }
-            $grade += $item->finalgrade * $item->aggregationweight;
-        }
+        $param = [
+            'userid' => $studentid,
+            'courseid' => $this->course->getCourseId()
+        ];
+        $grade = $DB->get_record('uet_grade', $param);
         return $grade;
     }
 
+    //get view post of student in section
     public function getViewPostInSection($section, $studentid)
     {
         global $DB;
         $time = $this->getTimeOfSection($section);
         $timestart = $time - 7 * 24 * 3600;
-        if (!$studentid) {
-            $sql = '';
-        } else {
-            $sql = 'AND userid = :userid';
-        }
+        $sql = 'AND userid = :userid';
         $params = [
-            'courseid' => $this->course->id,
+            'courseid' => $this->course->getCourseId(),
             'stype' => 'activity',
             'userid' => $studentid,
             'edulevel' => 2,
@@ -104,23 +82,21 @@ class uet_analytics
         return $result;
     }
 
-    public function getTotalViewPost($section, $studentid)
+    //get total view post of student from start date to current section
+    public function getTotalCurrentViewPost($studentid)
     {
         global $DB;
+        $section = $this->course->getCurrentSection();
         $time = $this->getTimeOfSection($section);
         $params = [
-            'courseid' => $this->course->id,
+            'courseid' => $this->course->getCourseId(),
             'stype' => 'activity',
             'userid' => $studentid,
             'edulevel' => 2,
             'action' => 'viewed',
             'timecreated' => $time
         ];
-        if (!$studentid) {
-            $sql = '';
-        } else {
-            $sql = 'AND userid = :userid';
-        }
+        $sql = 'AND userid = :userid';
         $view = $DB->get_record_sql("SELECT count(*) as view FROM {logstore_standard_log} WHERE courseid = :courseid 
                                                                                             AND action= :action
                                                                                             AND edulevel = :edulevel
@@ -137,22 +113,19 @@ class uet_analytics
         return $result;
     }
 
+    //get view post forum of student in section
     public function getForumViewPostInSection($section, $studentid)
     {
         global $DB;
         $time = $this->getTimeOfSection($section);
-        $params['courseid'] = $this->course->id;
+        $params['courseid'] = $this->course->getCourseId();
         $params['userid'] = $studentid;
         $logtable = 'logstore_standard_log';
         $params['component'] = 'mod_forum';
         $params['action'] = "viewed";
         $params['timecreated'] = $time;
         $params['timestart'] = $time - 7 * 24 * 3600;
-        if (!$studentid) {
-            $sql = '';
-        } else {
-            $sql = 'AND userid = :userid';
-        }
+        $sql = 'AND userid = :userid';
         $a = $DB->get_record_sql("SELECT count(*) as view FROM {" . $logtable . "}
                                         WHERE  courseid=:courseid AND component = :component $sql AND action=:action AND timecreated >= :timestart AND timecreated <= :timecreated ", $params);
         $result["view"] = isset($a->view) ? $a->view : 0;
@@ -163,11 +136,13 @@ class uet_analytics
         return $result;
     }
 
-    public function getTotalFormViewPost($section, $studentid)
+    //get view post forum of student from start date to current section
+    public function getTotalCurrentForumViewPost($studentid)
     {
         global $DB;
+        $section = $this->course->getCurrentSection();
         $time = $this->getTimeOfSection($section);
-        $params['courseid'] = $this->course->id;
+        $params['courseid'] = $this->course->getCourseId();
         $params['userid'] = $studentid;
         $logtable = 'logstore_standard_log';
         $params['component'] = 'mod_forum';
@@ -183,12 +158,13 @@ class uet_analytics
         return $result;
     }
 
+    // get all assignment submission from start date to section
     public function getAssignmentSubmissionInSection($section, $studentid)
     {
         global $DB;
         $submission = new stdClass();
         $params['userid'] = $studentid;
-        $params['courseid'] = $this->getCourseId();
+        $params['courseid'] = $this->course->getCourseId();
         $params['timemodified'] = $this->getTimeOfSection($section);
         $assigns = $this->getAssignmentInSection($section);
         $submission->total = count($assigns);
@@ -216,6 +192,7 @@ class uet_analytics
         return $submission;
     }
 
+    //get number submitted in assignment $id
     public function getSubmissionInAssignment($id)
     {
         global $DB;
@@ -227,108 +204,46 @@ class uet_analytics
         }
     }
 
-    public function getStudentsInCourse()
-    {
-        global $DB;
-        $params['courseid'] = $this->getCourseId();
-        $students = $DB->get_records_sql("  SELECT ra.userid FROM {role_assignments} ra JOIN {context} c ON ra.contextid = c.id
-                                                                         WHERE c.instanceid = :courseid AND ra.roleid = 5", $params);
-        return $students;
-    }
-
-    public function getSection($section)
-    {
-        global $DB;
-        $params['courseid'] = $this->getCourseId();
-        if ($section == 0) {
-            $sql = '';
-        } else {
-            $sql = 'AND section <= ' . $section;
-        }
-        $sections = $DB->get_records_sql("SELECT id,course,section,name FROM {course_sections}
-                                                 WHERE course =:courseid AND section != 0 $sql ", $params);
-        return $sections;
-    }
-
+    //get number module to $section
     public function getNumberModulesInSection($section)
     {
-        $modules = 0;
-        foreach ($this->cm as $cm) {
-            if ($this->sections[$cm->section]->section <= $section) {
-                $modules++;
-            }
-        }
-        return $modules;
+        global $DB;
+        $params['courseid']= $this->course->getCourseId();
+        $params['section'] = $section;
+        $cm = $DB->get_record_sql('SELECT COUNT(*) as num FROM {course_modules} WHERE course = :courseid AND section <= :section',$params);
+        return $cm->num;
     }
 
+    //get number forum discussion to $section
     public function getNumberForumDiscussionsInSection($section)
     {
         global $DB;
         $time = $this->getTimeOfSection($section);
-        $params['courseid'] = $this->getCourseId();
+        $params['courseid'] = $this->course->getCourseId();
         $params['timemodified'] = $time;
         $forum = $DB->get_record_sql("SELECT COUNT(*) AS number FROM {forum_discussions} WHERE course = :courseid AND timemodified <= :timemodified", $params);
         return $forum->number;
     }
 
+    //get all assignments from start date to $section
     public function getAssignmentInSection($section)
     {
         global $DB;
-        $assigns = [];
-        if ($section == 0) {
-            return $this->assigns;
-        }
-        foreach ($this->cm as $cm) {
-            if ($cm->module == $this->moduleType['assign']) {
-                if ($this->sections[$cm->section]->section <= $section) {
-                    $assigns[] = $this->assigns[$cm->instance];
-                }
-            }
-        }
-        return $assigns;
-    }
-
-    public function getAllAssigns()
-    {
-        global $DB;
-        $courseid = $this->getCourseId();
-        $params['courseid'] = $courseid;
+        $time = $this->getTimeOfSection($section);
+        $params['courseid'] = $this->course->getCourseId();
+        $params['duedate'] = $time;
         $assigns = $DB->get_records_sql("SELECT id,course,name,duedate,allowsubmissionsfromdate FROM {assign}
-                                            WHERE course = :courseid", $params);
+                                            WHERE course = :courseid AND duedate <= :duedate", $params);
         if (!$assigns) {
             return false;
         }
         return $assigns;
     }
 
-    public function getAllForums()
-    {
-
-    }
-
-    public function getCourseModules()
-    {
-        global $DB;
-        $params['courseid'] = $this->getCourseId();
-        $cm = $DB->get_records_sql("SELECT * FROM {course_modules} WHERE course =:courseid", $params);
-        if ($cm) return $cm;
-        else return 0;
-    }
-
-    public function getModuleType()
-    {
-        global $DB;
-        $modules = $DB->get_records_sql("SELECT * FROM {modules}");
-        $m = [];
-        foreach ($modules as $module) {
-            $m[$module->name] = $module->id;
-        }
-        return $m;
-    }
-
+    //predict student grade
     public function predict($studentid)
     {
-        $week = $this->getCurrentSection();
+        $week = $this->course->getCurrentSection();
         if ($week < 3) {
             return ['w7' => 0, 'w15' => 0];
         } elseif ($week >= 3 && $week < 6) {
@@ -365,6 +280,7 @@ class uet_analytics
         return $response;
     }
 
+    // test predict by webservices
     public function curlRequest($postfield)
     {
         $ch = curl_init();
@@ -378,29 +294,67 @@ class uet_analytics
         return $server_output;
     }
 
-    public function getCurrentSection()
+    // predict grade by python
+    public function runPythonPredict($data)
     {
-        $now = strtotime('now');
-        if ($this->course->format == 'weeks') {
-            if ($now >= $this->course->enddate) {
-                return count($this->sections);
-            } else {
-                $t = $now - $this->course->startdate;
-                $w = intval($t / (7 * 24 * 3600)) + 1;
-                return $w;
-            }
-        } else {
-            $t = $now - $this->course->startdate;
-            $w = intval($t / (7 * 24 * 3600)) + 1;
-            return $w;
-        }
-    }
-
-    public function runPythonPredict($data){
-        $d = implode(' ',$data);
-        $cmd ="cd backend ; python3 -W ignore main.py ".$d." 2>&1";
+        $d = implode(' ', $data);
+        $cmd = "cd backend ; python3 -W ignore main.py " . $d . " 2>&1";
         $output = shell_exec($cmd);
         $output = json_decode($output);
         return $output;
+    }
+
+    // import grade for
+    public function importGrade($course, $file)
+    {
+        global $CFG, $DB;
+        require_once("$CFG->libdir/phpexcel/PHPExcel.php");
+        $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel = $objReader->load($file);
+        $sheet = $excel->getSheet(0);
+        $lastRow = $sheet->getHighestRow();
+        $grade = new stdClass();
+        $grade->courseid = $course;
+        for ($row = 2; $row <= $lastRow; $row++) {
+            $studentNo = $sheet->getCell('C' . $row)->getValue();
+            $userid = $DB->get_record('user', ['id' => $studentNo]);
+            $grade->userid = $userid->id;
+            $g = $DB->get_record('uet_grade', ['courseid' => $grade->courseid, 'userid' => $grade->userid]);
+            if ($g) {
+                $g->mid = $sheet->getCell('D' . $row)->getValue();
+                $g->final = $sheet->getCell('E' . $row)->getValue();
+                $DB->update_record('uet_grade', $g);
+
+            } else {
+                $grade->mid = $sheet->getCell('D' . $row)->getValue();
+                $grade->final = $sheet->getCell('E' . $row)->getValue();
+                $DB->insert_record('uet_grade', $grade);
+            }
+        }
+    }
+
+    public function getCourseAnalytics($section){
+        global $DB;
+        $time = $this->getTimeOfSection($section);
+        $params['courseid'] = $this->course->getCourseId();
+        $logtable = 'logstore_standard_log';
+        $params['component'] = 'mod_forum';
+        $params['action'] = "viewed";
+        $params['timecreated'] = $time;
+        $params['timestart'] = $time - 7 * 24 * 3600;
+        $a = $DB->get_record_sql("SELECT count(*) as view FROM {" . $logtable . "}
+                                        WHERE  courseid=:courseid AND component = :component  AND action=:action AND timecreated >= :timestart AND timecreated <= :timecreated ", $params);
+        $result["forumview"] = isset($a->view) ? $a->view : 0;
+        $a = $DB->get_record_sql("SELECT count(*) as view FROM {" . $logtable . "}
+                                        WHERE  courseid=:courseid  AND action=:action AND timecreated >= :timestart AND timecreated <= :timecreated ", $params);
+        $result["view"] = isset($a->view) ? $a->view : 0;
+        $post_actions = '"submitted" ,"created", "deleted", "updated", "uploaded", "sent"';
+        $a = $DB->get_record_sql("SELECT count(*) as post FROM {" . $logtable . "}
+                                        WHERE courseid=:courseid  AND component = :component AND action IN ($post_actions) AND timecreated >= :timestart AND timecreated <= :timecreated ", $params);
+        $result['forumpost'] = isset($a->post) ? $a->post : 0;
+        $a = $DB->get_record_sql("SELECT count(*) as post FROM {" . $logtable . "}
+                                        WHERE courseid=:courseid   AND action IN ($post_actions) AND timecreated >= :timestart AND timecreated <= :timecreated ", $params);
+        $result['post'] = isset($a->post) ? $a->post : 0;
+        return $result;
     }
 }

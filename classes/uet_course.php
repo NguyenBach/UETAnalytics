@@ -5,7 +5,8 @@
  * Date: 3/11/18
  * Time: 8:42 AM
  */
-require_once 'uet_user.php';
+
+namespace mod_uetanalytics;
 
 class uet_course
 {
@@ -72,6 +73,10 @@ class uet_course
         return date_format($date, 'y-m-d H:m');
     }
 
+    public function getStartDateInt(){
+        return $this->course->startdate;
+    }
+
     public function getNumberStudent()
     {
         global $DB;
@@ -125,5 +130,61 @@ class uet_course
             $w = intval($t/(7*24*3600))+1;
             return $w;
         }
+    }
+
+    public function getSection($section)
+    {
+        global $DB;
+        $params['courseid'] = $this->getCourseId();
+        if ($section == 0) {
+            $sql = '';
+        } else {
+            $sql = 'AND section <= ' . $section;
+        }
+        $sections = $DB->get_records_sql("SELECT id,course,section,name FROM {course_sections}
+                                                 WHERE course =:courseid AND section != 0 $sql ", $params);
+        return $sections;
+    }
+
+    public function getStudents()
+    {
+        global $DB;
+        $params['courseid'] = $this->getCourseId();
+        $students = $DB->get_records_sql("  SELECT ra.userid FROM {role_assignments} ra JOIN {context} c ON ra.contextid = c.id
+                                                                         WHERE c.instanceid = :courseid AND ra.roleid = 5", $params);
+        return $students;
+    }
+
+    public function getAllAssigns()
+    {
+        global $DB;
+        $params['courseid'] = $this->getCourseId();
+        $assigns = $DB->get_records_sql("SELECT id,course,name,duedate,allowsubmissionsfromdate FROM {assign}
+                                            WHERE course = :courseid", $params);
+        if (!$assigns) {
+            return false;
+        }
+        return $assigns;
+    }
+
+    public function getCourseModules()
+    {
+        global $DB;
+        $params['courseid'] = $this->getCourseId();
+        $cm = $DB->get_records_sql("SELECT * FROM {course_modules} WHERE course =:courseid", $params);
+        if ($cm) return $cm;
+        else return 0;
+    }
+
+    public function getTotalViewPostInSection($section){
+
+    }
+
+    public function getTotalCurrentForumViewPost(){
+
+    }
+
+    public function getTotalCurrentAssignSubmission(){
+
     }
 }

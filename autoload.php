@@ -7,8 +7,6 @@
  */
 
 require_once ('../../config.php');
-require_once ('classes/uet_helper.php');
-require_once ('classes/uet_render.php');
-require_once ('classes/uet_analytics.php');
-require_once ('classes/uet_course.php');
-require_once ('classes/uet_user.php');
+require_once ('form.php');
+require_once ('classes/uet_student.php');
+require_once ('classes/uet_ajax.php');

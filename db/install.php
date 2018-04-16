@@ -23,5 +23,4 @@ function xmldb_uetanalytics_install() {
     shell_exec('pip3 install uetla');
     $command = 'cd '.$CFG->dirroot.'/mod/uetanalytics/backend ; python3 model.py  2>&1';
     $a = shell_exec($command);
-    var_dump($a);
 }

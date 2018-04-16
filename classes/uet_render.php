@@ -6,6 +6,8 @@
  * Time: 8:36 AM
  */
 
+namespace mod_uetanalytics;
+use \moodle_url;
 
 class uet_render
 {
@@ -21,7 +23,7 @@ class uet_render
         $this->course = new uet_course($cm->course);
         $this->user = new uet_user($userid);
         $this->uet = new uet_analytics($this->course->getCourse());
-        $this->context = context_module::instance($cm->id);
+        $this->context = \context_module::instance($cm->id);
     }
 
     public function getContext()
@@ -143,18 +145,25 @@ class uet_render
         $section = $this->course->getCurrentSection();
         $label = [];
         if ($this->user->isTeacher($this->context)) {
-            $userid = 0;
+            for ($i = 1; $i <= $section; $i++) {
+                $label [] = $i;
+                $viewpost = $this->uet->getCourseAnalytics($i);
+                $data['view'][] = $viewpost['view'];
+                $data['post'][] = $viewpost['post'];
+                $data['fview'][] = $viewpost['forumview'];
+                $data['fpost'][] = $viewpost['forumpost'];
+            }
         } else {
             $userid = $this->user->getUserId();
-        }
-        for ($i = 1; $i <= $section; $i++) {
-            $label [] = $i;
-            $viewpost = $this->uet->getViewPostInSection($i, $userid);
-            $forum = $this->uet->getForumViewPostInSection($i, $userid);
-            $data['view'][] = $viewpost['view'];
-            $data['post'][] = $viewpost['post'];
-            $data['fview'][] = $forum['view'];
-            $data['fpost'][] = $forum['post'];
+            for ($i = 1; $i <= $section; $i++) {
+                $label [] = $i;
+                $viewpost = $this->uet->getViewPostInSection($i, $userid);
+                $forum = $this->uet->getForumViewPostInSection($i, $userid);
+                $data['view'][] = $viewpost['view'];
+                $data['post'][] = $viewpost['post'];
+                $data['fview'][] = $forum['view'];
+                $data['fpost'][] = $forum['post'];
+            }
         }
         $series = '';
         foreach ($data as $key => $d) {
@@ -187,9 +196,9 @@ class uet_render
         $assigns = $this->uet->getAssignmentInSection($section);
         $label = [];
         $series = [];
-        foreach ($assigns as $assign){
+        foreach ($assigns as $assign) {
             $label[] = $assign->name;
-            $series[] = floatval(round($this->uet->getSubmissionInAssignment($assign->id)/$this->course->getNumberStudent()*100));
+            $series[] = floatval(round($this->uet->getSubmissionInAssignment($assign->id) / $this->course->getNumberStudent() * 100));
         }
         ?>
         <script type="text/javascript">
@@ -217,6 +226,7 @@ class uet_render
         ';
         return $script;
     }
+
 
     public function setPage($url)
     {
