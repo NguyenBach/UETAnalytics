@@ -6,6 +6,7 @@
  * Time: 15:03
  */
 require_once('autoload.php');
+use mod_uetanalytics\uet_analytics;
 global $CFG;
 require_login();
 
@@ -16,7 +17,7 @@ $PAGE->set_title("UET Import Grade");
 $uet = new uet_analytics($COURSE);
 echo $OUTPUT->header();
 echo '<h1>Import Grade</h1>';
-$form = new import_grade_form( null, null,  'post',  '',  null,  true, null, 830);
+$form = new import_grade_form( null, null,  'post',  '',  null,  true, null, $course);
 if ($form->is_cancelled()) {
 
 }

@@ -7,8 +7,11 @@
  */
 
 namespace mod_uetanalytics;
+require_once("$CFG->libdir/phpexcel/PHPExcel.php");
 
+use function PHPSTORM_META\map;
 use stdClass;
+use PHPExcel_IOFactory;
 
 class uet_analytics
 {
@@ -17,12 +20,12 @@ class uet_analytics
 
     public function __construct($course)
     {
-        if($course instanceof uet_course){
+        if ($course instanceof uet_course) {
             $this->course = $course;
-        }else{
-            if(isset($course->id) ){
+        } else {
+            if (isset($course->id)) {
                 $this->course = new uet_course($course->id);
-            }else{
+            } else {
                 $this->course = new uet_course($course);
             }
         }
@@ -258,10 +261,10 @@ class uet_analytics
     public function getNumberModulesInSection($section)
     {
         global $DB;
-        $params['courseid']= $this->course->getCourseId();
-        $params['course']= $this->course->getCourseId();
+        $params['courseid'] = $this->course->getCourseId();
+        $params['course'] = $this->course->getCourseId();
         $params['section'] = $section;
-        $cm = $DB->get_record_sql('SELECT COUNT(*) as num FROM {course_modules} WHERE course = :courseid AND section IN (SELECT id FROM {course_sections} WHERE course <= :course AND section <=:section) ',$params);
+        $cm = $DB->get_record_sql('SELECT COUNT(*) as num FROM {course_modules} WHERE course = :courseid AND section IN (SELECT id FROM {course_sections} WHERE course <= :course AND section <=:section) ', $params);
         return $cm->num;
     }
 
@@ -310,6 +313,7 @@ class uet_analytics
         } else {
             $week = 15;
         }
+        $week = 15;
         $row['week'] = $week;
         $stat = $this->getViewPost($week, $studentid);
         $modules = $this->getNumberModulesInSection($week);
@@ -359,7 +363,6 @@ class uet_analytics
     public function importGrade($course, $file)
     {
         global $CFG, $DB;
-        require_once("$CFG->libdir/phpexcel/PHPExcel.php");
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
         $excel = $objReader->load($file);
         $sheet = $excel->getSheet(0);
@@ -384,7 +387,8 @@ class uet_analytics
         }
     }
 
-    public function getCourseAnalytics($section){
+    public function getCourseAnalytics($section)
+    {
         global $DB;
         $time = $this->getTimeOfSection($section);
         $params['courseid'] = $this->course->getCourseId();
@@ -408,4 +412,6 @@ class uet_analytics
         $result['post'] = isset($a->post) ? $a->post : 0;
         return $result;
     }
+
+
 }

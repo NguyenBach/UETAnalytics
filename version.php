@@ -7,7 +7,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018041600;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2015050500;    // Requires this Moodle version
-$plugin->component = 'mod_uetanalytics'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2018041600;
+$plugin->requires  = 2015050500;
+$plugin->component = 'mod_uetanalytics';
 $plugin->cron      = 0;

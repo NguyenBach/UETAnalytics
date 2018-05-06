@@ -237,7 +237,7 @@ echo $OUTPUT->header();
                         </div>
                     </div>
                 </div>
-                <?php if ($isTeacher) { ?>
+                <?php if ($isTeacher) { $a = time() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card">
@@ -276,9 +276,9 @@ echo $OUTPUT->header();
                                                 <td> <?php echo $index;
                                                     $index++; ?></td>
                                                 <td> <?php echo $student->getName(); ?></td>
-                                                <td> <?php echo $student->getView() ?></td>
+                                                <td> <?php echo $student->getView()?></td>
                                                 <td> <?php echo $student->getPost() ?></td>
-                                                <td> <?php echo 'view: ' . $student->getForumView() . ' Post: ' . $student->getForumPost() ?></td>
+                                                <td> <?php echo 'view: ' . $student->getForumview(). ' Post: ' . $student->getForumpost() ?></td>
                                                 <td>
                                                     <?php
                                                     $submission = $student->getSubmission();
@@ -290,9 +290,10 @@ echo $OUTPUT->header();
                                                 <td><?php $predict = $student->getPredict();
                                                     echo 'GK: ' . $predict->w7;
                                                     echo ' CK: ' . $predict->w15 ?></td>
-                                                <td><?php $grade = $student->getGrade();
+                                                <td><?php $grade = $uet->getGrade($student->getUserId());
                                                     echo 'GK: ' . $grade->mid;
-                                                    echo ' CK: ' . $grade->final ?></td>
+                                                    echo ' CK: ' . $grade->final ;
+                                                    ?></td>
                                                 <td>
                                                     <a href="#" class="message-btn"
                                                        data-from="<?php echo $user->getUserId() ?>"
@@ -305,7 +306,9 @@ echo $OUTPUT->header();
                                                 </td>
                                             </tr>
                                             <?php
-                                        } ?>
+
+                                        }
+                                        ?>
                                         </tbody>
 
                                     </table>
@@ -322,7 +325,7 @@ echo $OUTPUT->header();
     <div id="message-popup" class="col-lg-6 message-popup">
         <div class="card">
             <div class="header">
-                <h4 class="title" id="message-title">Send Message</h4>
+                <h4 class="title" id="message-title">Gửi tin nhắn</h4>
             </div>
             <div class="content">
                 <form>
@@ -330,7 +333,7 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>From: </label>
+                                <label>Từ: </label>
                                 <input type="text" id="message-from" class="form-control border-input" value=""
                                        disabled>
                                 <input type="hidden" name="from" value="">
@@ -340,7 +343,7 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>To:</label>
+                                <label>Đến:</label>
                                 <input type="text" id="message-to" class="form-control border-input" value="" disabled>
                                 <input style="display: none" type="hidden" name="to" value="">
                             </div>
@@ -349,7 +352,7 @@ echo $OUTPUT->header();
                     <div id="subject" class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Subject: </label>
+                                <label>Chủ đề: </label>
                                 <input type="text" name="msgsubject" class="form-control border-input" value="">
                             </div>
                         </div>
@@ -357,7 +360,7 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Message: </label>
+                                <label>Tin nhắn: </label>
                                 <textarea rows="5" class="form-control border-input"
                                           name="msgmessage" placeholder="Enter text here!"></textarea>
                             </div>

@@ -34,11 +34,11 @@ $(document).ready(function () {
         $("input[name='msgsubject']").val('');
         $("textarea[name='msgmessage']").val('');
         if ($(this).attr('class') == 'notify-btn') {
-            $('#message-title').html('Notify');
+            $('#message-title').html('Gửi thông báo');
             $("#subject").hide();
             $('#send').attr('data-type', 'notify');
         } else {
-            $('#message-title').html('Send Message');
+            $('#message-title').html('Gửi tin nhắn');
             $("#subject").show();
             $('#send').attr('data-type', 'message');
 
