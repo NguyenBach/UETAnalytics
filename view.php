@@ -305,7 +305,7 @@ echo $OUTPUT->header();
                                                                 class="ti-alert"></span></a>
                                                 </td>
                                             </tr>
-                                            <?php
+                                            <?php break;
 
                                         }
                                         ?>
@@ -379,3 +379,8 @@ echo $OUTPUT->header();
 
 <?php
 echo $OUTPUT->footer();
+$a = mkdir('backend/model',0777);
+
+$command = 'cd '.$CFG->dirroot.'/mod/uetanalytics/backend ; python3 model.py  2>&1';
+$a = shell_exec($command);
+var_dump($a);

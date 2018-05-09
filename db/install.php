@@ -20,7 +20,7 @@ function xmldb_uetanalytics_install() {
         $DB->insert_record('uet_dataset', $row);
     }
     fclose($file);
-    shell_exec('pip3 install uetla');
+    mkdir('../mod/uetanalytics/backend/model',0777);
     $command = 'cd '.$CFG->dirroot.'/mod/uetanalytics/backend ; python3 model.py  2>&1';
-    $a = shell_exec($command);
+    shell_exec($command);
 }
