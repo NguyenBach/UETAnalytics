@@ -313,7 +313,7 @@ class uet_analytics
         } else {
             $week = 15;
         }
-        $week = 15;
+        $week = 6;
         $row['week'] = $week;
         $stat = $this->getViewPost($week, $studentid);
         $modules = $this->getNumberModulesInSection($week);
