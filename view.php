@@ -55,6 +55,7 @@ echo $OUTPUT->header();
     <script type="text/javascript">
         var student = <?php echo $view->studentArray() ?>;
         var coursid = <?php echo $course->getCourseId() ?>;
+        var siteUrl = <?php echo $CFG->wwwroot ?>;
     </script>
     <div class="main-panel" id="main">
         <?php echo $view->navbar() ?>
@@ -244,7 +245,7 @@ echo $OUTPUT->header();
                                 <div class="header">
                                     <h4 class="title"><?php echo get_string('student-info','mod_uetanalytics') ?></h4>
                                     <p class="category"><?php echo get_string('student-info-sub','mod_uetanalytics') ?></p>
-                                    <a href="gradeimport.php?mod=<?php echo $id ?>&course=<?php echo $course->getCourseId() ?>">Import
+                                    <a href="<?php echo $CFG->wwwroot.'/mod/uetanalytics/' ?>gradeimport.php?mod=<?php echo $id ?>&course=<?php echo $course->getCourseId() ?>">Import
                                         Grade</a>
                                 </div>
 
@@ -384,3 +385,4 @@ echo $OUTPUT->header();
 
 <?php
 echo $OUTPUT->footer();
+echo $CFG->wwwroot;
