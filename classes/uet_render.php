@@ -36,12 +36,6 @@ class uet_render
         $navbar = ' <nav class="navbar navbar-default">
                 <div class="container-fluid">
                     <div class="navbar-header">
-                        <button type="button" class="navbar-toggle">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar bar1"></span>
-                            <span class="icon-bar bar2"></span>
-                            <span class="icon-bar bar3"></span>
-                        </button>
                         <a class="navbar-brand" href="#">Dashboard</a>
                     </div>
             </nav>';
@@ -81,17 +75,17 @@ class uet_render
                     <div class="row">
                         <div class="col-md-3 col-md-offset-1">
                              <h5>' . $this->user->getNumberCourses() . '<br/>
-                                 <small>Lớp học</small>
+                                 <small>'.get_string('numbercourse','mod_uetanalytics').'</small>
                              </h5>
                         </div>
                         <div class="col-md-4">
-                             <h5>' . $this->user->getLassAccess($this->course->getCourseId()) . '<br/>
-                                 <small>Current login</small>
+                             <h5>' . $this->user->getLastAccess($this->course->getCourseId()) . '<br/>
+                                 <small>'.get_string('currentlogin','mod_uetanalytics').'</small>
                              </h5>
                         </div>
                         <div class="col-md-3">
                              <h5>' . $this->user->getLastIP() . '<br/>
-                                 <small>Last IP</small>
+                                 <small>'.get_string('lastip','mod_uetanalytics').'</small>
                              </h5>
                         </div>
                     </div>
@@ -125,13 +119,13 @@ class uet_render
                             <div class="text-center">
                                 <div class="row">
                                     <div class="col-md-3 col-md-offset-1">
-                                        <h5>' . $this->course->getNumberStudent() . '<br /><small>Sinh viên</small></h5>
+                                        <h5>' . $this->course->getNumberStudent() . '<br /><small>'.get_string('numberstudent','mod_uetanalytics').'</small></h5>
                                     </div>
                                     <div class="col-md-4">
-                                        <h5>' . $this->course->getStartDate() . '<br /><small>Ngày bắt đầu</small></h5>
+                                        <h5>' . $this->course->getStartDate() . '<br /><small>'.get_string('startdate','mod_uetanalytics').'</small></h5>
                                     </div>
                                     <div class="col-md-3">
-                                        <h5>' . $this->course->getNumberModules() . '<br /><small>Hoạt động</small></h5>
+                                        <h5>' . $this->course->getNumberModules() . '<br /><small>'.get_string('numberactivity','mod_uetanalytics').'</small></h5>
                                     </div>
                                 </div>
                             </div>
@@ -243,8 +237,8 @@ class uet_render
         global $PAGE, $CFG;
         $PAGE->set_pagelayout('course');
         $PAGE->set_pagetype("course");
-        $PAGE->set_title("UET Statistic");
-        $PAGE->set_heading('UET Statistic');
+        $PAGE->set_title(get_string('title','mod_uetanalytics'));
+        $PAGE->set_heading(get_string('title','mod_uetanalytics'));
         $PAGE->set_context($this->context);
         $PAGE->set_url($url);
         $PAGE->set_cm($this->cm);

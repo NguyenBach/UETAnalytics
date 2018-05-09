@@ -16,7 +16,7 @@ class mod_uetanalytics_mod_form extends moodleform_mod {
         // General --------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $label = "Name: ";
+        $label = get_string('name','mod_uetanalytics');
         $mform->addElement('text', 'name', $label, array('size' => '64','value'=>"UET Learning Analytics"));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -25,9 +25,9 @@ class mod_uetanalytics_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $this->standard_intro_elements("Introduction:");
+        $this->standard_intro_elements(get_string('introduction','mod_uetanalytics'));
 
-        $mform->addElement('text', 'name', $label, array('size' => '64','value'=>"UET Learning Analytics"));
+//        $mform->addElement('text', 'name', $label, array('size' => '64','value'=>"UET Learning Analytics"));
 
 
         $this->standard_coursemodule_elements();

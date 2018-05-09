@@ -60,12 +60,11 @@ class uet_user
         return 0;
     }
 
-    public function getLassAccess($courseid)
+    public function getLastAccess($courseid)
     {
         global $DB;
         $access = $DB->get_record('user_lastaccess', array('userid' => $this->user->id, 'courseid' => $courseid));
-        $date = date_create($access->timeaccess);
-        return date_format($date, 'y-m-d H:m');
+        return date( 'y-m-d H:m',$access->timeaccess);
     }
 
     public function getLastIP()

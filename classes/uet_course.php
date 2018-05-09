@@ -69,8 +69,7 @@ class uet_course
 
     public function getStartDate()
     {
-        $date = date_create($this->course->startdate);
-        return date_format($date, 'y-m-d H:m');
+        return date( 'y-m-d H:m',$this->course->startdate);
     }
 
     public function getStartDateInt(){

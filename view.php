@@ -75,7 +75,7 @@ echo $OUTPUT->header();
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">Dự báo kết quả học tập</h4>
+                                    <h4 class="title"><?php echo get_string('gradepredict','mod_uetanalytics') ?></h4>
                                     <p class="category"></p>
                                 </div>
                                 <div class="content">
@@ -85,16 +85,16 @@ echo $OUTPUT->header();
                                                 <div class="content">
                                                     <div class="row">
                                                         <div class="col-xs-4">
-                                                            <h4>Giữa kỳ</h4></div>
+                                                            <h4><?php echo get_string('midterm','mod_uetanalytics') ?></h4></div>
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
-                                                                <p>Dự báo</p>
+                                                                <p><?php echo get_string('forecast','mod_uetanalytics') ?></p>
                                                                 <?php if (isset($result->w7)) echo $result->w7 ?>
                                                             </div>
                                                         </div>
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
-                                                                <p>Thực tế</p>
+                                                                <p><?php echo get_string('real','mod_uetanalytics') ?></p>
                                                                 <?php echo $grade->mid ?>
                                                             </div>
                                                         </div>
@@ -102,7 +102,7 @@ echo $OUTPUT->header();
                                                     <div class="footer">
                                                         <hr/>
                                                         <div class="stats">
-                                                            <i class="ti-reload"></i> Updated now
+                                                            <i class="ti-reload"></i>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -113,18 +113,18 @@ echo $OUTPUT->header();
                                                 <div class="content">
                                                     <div class="row">
                                                         <div class="col-xs-4">
-                                                            <h4>Cuối kỳ</h4>
+                                                            <h4><?php echo get_string('final','mod_uetanalytics') ?></h4>
                                                         </div>
 
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
-                                                                <p>Dự báo</p>
+                                                                <p><?php echo get_string('forecast','mod_uetanalytics') ?></p>
                                                                 <?php if (isset($result->w15)) echo $result->w15 ?>
                                                             </div>
                                                         </div>
                                                         <div class="col-xs-4">
                                                             <div class="numbers">
-                                                                <p>Thực tế</p>
+                                                                <p><?php echo get_string('real','mod_uetanalytics') ?></p>
                                                                 <?php echo $grade->final ?>
                                                             </div>
                                                         </div>
@@ -132,7 +132,7 @@ echo $OUTPUT->header();
                                                     <div class="footer">
                                                         <hr/>
                                                         <div class="stats">
-                                                            <i class="ti-reload"></i> Updated now
+                                                            <i class="ti-reload"></i>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -145,7 +145,7 @@ echo $OUTPUT->header();
                                                 <div class="content">
                                                     <div class="row">
                                                         <div class="col-xs-4">
-                                                            <h4>Thông báo:</h4></div>
+                                                            <h4><?php echo get_string('notify','mod_uetanalytics') ?></h4></div>
                                                         <div class="col-xs-8">
                                                             <?php if ($user instanceof uet_student) echo $user->getNotification() ?>
                                                         </div>
@@ -154,7 +154,7 @@ echo $OUTPUT->header();
                                                     <div class="footer">
                                                         <hr/>
                                                         <div class="stats">
-                                                            <i class="ti-reload"></i> Updated now
+                                                            <i class="ti-reload"></i>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -180,7 +180,7 @@ echo $OUTPUT->header();
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title"> Thống kê truy cập</h4>
+                                <h4 class="title"> <?php echo get_string('statistics','mod_uetanalytics') ?></h4>
                                 <p class="category"></p>
                             </div>
                             <div class="content">
@@ -204,7 +204,7 @@ echo $OUTPUT->header();
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title">Thống kê nộp bài tập</h4>
+                                <h4 class="title"><?php echo get_string('assign','mod_uetanalytics') ?></h4>
                                 <p class="category"></p>
                             </div>
                             <div class="content">
@@ -242,8 +242,8 @@ echo $OUTPUT->header();
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">Thông tin sinh viên</h4>
-                                    <p class="category">Thống kê hoạt động của từng sinh viên</p>
+                                    <h4 class="title"><?php echo get_string('student-info','mod_uetanalytics') ?></h4>
+                                    <p class="category"><?php echo get_string('student-info-sub','mod_uetanalytics') ?></p>
                                     <a href="gradeimport.php?mod=<?php echo $id ?>&course=<?php echo $course->getCourseId() ?>">Import
                                         Grade</a>
                                 </div>
@@ -305,7 +305,7 @@ echo $OUTPUT->header();
                                                                 class="ti-alert"></span></a>
                                                 </td>
                                             </tr>
-                                            <?php break;
+                                            <?php
 
                                         }
                                         ?>
@@ -323,9 +323,14 @@ echo $OUTPUT->header();
 
     </div>
     <div id="message-popup" class="col-lg-6 message-popup">
+        <script type="text/javascript">
+            var message = "<?php echo get_string('message','mod_uetanalytics') ?>";
+            var notify = "<?php echo get_string('notify','mod_uetanalytics') ?>"
+
+        </script>
         <div class="card">
             <div class="header">
-                <h4 class="title" id="message-title">Gửi tin nhắn</h4>
+                <h4 class="title" id="message-title"><?php echo get_string('message','mod_uetanalytics') ?></h4>
             </div>
             <div class="content">
                 <form>
@@ -333,7 +338,7 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Từ: </label>
+                                <label><?php echo get_string('from','mod_uetanalytics') ?></label>
                                 <input type="text" id="message-from" class="form-control border-input" value=""
                                        disabled>
                                 <input type="hidden" name="from" value="">
@@ -343,7 +348,7 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Đến:</label>
+                                <label><?php echo get_string('to','mod_uetanalytics') ?></label>
                                 <input type="text" id="message-to" class="form-control border-input" value="" disabled>
                                 <input style="display: none" type="hidden" name="to" value="">
                             </div>
@@ -352,7 +357,7 @@ echo $OUTPUT->header();
                     <div id="subject" class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Chủ đề: </label>
+                                <label><?php echo get_string('subject','mod_uetanalytics') ?> </label>
                                 <input type="text" name="msgsubject" class="form-control border-input" value="">
                             </div>
                         </div>
@@ -360,16 +365,16 @@ echo $OUTPUT->header();
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Tin nhắn: </label>
+                                <label><?php echo get_string('message-content','mod_uetanalytics') ?></label>
                                 <textarea rows="5" class="form-control border-input"
                                           name="msgmessage" placeholder="Enter text here!"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="text-center">
-                        <button type="button" id="send" data-type="message" class="btn btn-info btn-fill btn-wd">Send
+                        <button type="button" id="send" data-type="message" class="btn btn-info btn-fill btn-wd"><?php echo get_string('send','mod_uetanalytics') ?>
                         </button>
-                        <button type="button" id="cancel" class="btn btn-info btn-fill btn-wd">Cancel</button>
+                        <button type="button" id="cancel" class="btn btn-info btn-fill btn-wd"><?php echo get_string('cancel','mod_uetanalytics') ?></button>
                     </div>
                     <div class="clearfix"></div>
                 </form>
@@ -379,8 +384,3 @@ echo $OUTPUT->header();
 
 <?php
 echo $OUTPUT->footer();
-$a = mkdir('backend/model',0777);
-
-$command = 'cd '.$CFG->dirroot.'/mod/uetanalytics/backend ; python3 model.py  2>&1';
-$a = shell_exec($command);
-var_dump($a);
