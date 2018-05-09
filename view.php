@@ -55,7 +55,7 @@ echo $OUTPUT->header();
     <script type="text/javascript">
         var student = <?php echo $view->studentArray() ?>;
         var coursid = <?php echo $course->getCourseId() ?>;
-        var siteUrl = <?php echo $CFG->wwwroot ?>;
+        var siteUrl = '<?php echo $CFG->wwwroot ?>';
     </script>
     <div class="main-panel" id="main">
         <?php echo $view->navbar() ?>
